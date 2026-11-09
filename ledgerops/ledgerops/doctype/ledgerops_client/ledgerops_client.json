@@ -1,0 +1,73 @@
+{
+  "doctype": "DocType",
+  "name": "LedgerOps Client",
+  "module": "LedgerOps",
+  "custom": 0,
+  "istable": 0,
+  "is_submittable": 0,
+  "is_tree": 0,
+  "editable_grid": 0,
+  "engine": "InnoDB",
+  "autoname": "hash",
+  "track_changes": 1,
+  "allow_rename": 0,
+  "fields": [
+    {
+      "fieldname": "client_name",
+      "label": "Client Name",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "email",
+      "label": "Email",
+      "fieldtype": "Data",
+      "options": "Email"
+    },
+    {
+      "fieldname": "phone",
+      "label": "Phone",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "accounting_system",
+      "label": "Accounting System",
+      "fieldtype": "Select",
+      "options": "Other\nTally\nZoho Books\nQuickBooks\nXero\nExcel"
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Active\nInactive",
+      "default": "Active",
+      "in_list_view": 1
+    }
+  ],
+  "field_order": [
+    "client_name",
+    "email",
+    "phone",
+    "accounting_system",
+    "status"
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1,
+      "export": 1,
+      "report": 1,
+      "import": 1
+    }
+  ],
+  "actions": [],
+  "links": [],
+  "states": []
+}

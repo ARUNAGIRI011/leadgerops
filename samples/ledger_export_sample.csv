@@ -1,0 +1,3 @@
+posting_date,description,reference,debit,credit,currency
+2026-10-01,Sample receipt,UTR-DEMO-001,0.00,1250.00,INR
+2026-10-02,Sample bank charges,CHG-DEMO-002,25.00,0.00,INR
