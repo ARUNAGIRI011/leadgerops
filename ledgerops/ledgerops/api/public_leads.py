@@ -23,8 +23,9 @@ def submit_demo_request(name: str, email: str, company: str, country: str = "",
     if website:
         return {"ok": True, "message": "Thank you. Your request has been received."}
 
-    ip = (frappe.local.request.headers.get("CF-Connecting-IP")
-          or frappe.local.request.remote_addr or "unknown")
+    # Use the server-observed peer address. Do not trust a caller-supplied forwarding header
+    # unless the reverse-proxy trust chain has been explicitly configured. 
+    ip = frappe.local.request.remote_addr or "unknown"
     cache = frappe.cache()
     key = "ledgerops:demo-request:" + frappe.generate_hash(ip, length=24)
     try:
@@ -47,7 +48,7 @@ def submit_demo_request(name: str, email: str, company: str, country: str = "",
     phone = _clean(phone, 40)
     message = _clean(message, 1500)
 
-    if not name or not company or not re.fullmatch(r"[^@\\s]+@[^@\\s]+\\.[^@\\s]+", email):
+    if not name or not company or not re.fullmatch(r"[^@ ]+@[^@ ]+[.][^@ ]+", email):
         frappe.throw(_("Enter your name, company and a valid business email"))
     if consent not in ("1", "true", "on", "yes"):
         frappe.throw(_("Please accept the privacy notice to request a demo"))
