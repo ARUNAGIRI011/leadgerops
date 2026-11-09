@@ -86,4 +86,4 @@ def submit_demo_request(name: str, email: str, company: str, country: str = "",
         doc.insert(ignore_permissions=True)
         lead_name = doc.name
 
-    return {"ok": True, "message": "Thank you. Our team will contact you about a LedgerOps demo.", "lead_reference": lead_name}
+    return {"ok": True, "message": "Thank you. Our team will contact you about a LedgerOps demo."}
