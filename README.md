@@ -2,79 +2,105 @@
 
 **Reconciliation exceptions → client evidence → review → month-end close.**
 
-LedgerOps is an open-source, Frappe-based workflow app for accounting and bookkeeping practices. It complements existing accounting systems (Tally, Zoho Books, QuickBooks, Xero and spreadsheets); it is not a general ledger, tax-filing engine or source of accounting truth.
+LedgerOps is a Frappe-based workflow app for accounting and bookkeeping practices. It complements Tally, Zoho Books, QuickBooks, Xero and spreadsheet exports; it is not a general ledger, tax-filing engine or source of accounting truth.
 
-> Repository name: `leadgerops` (as created in GitHub). Python/Frappe app name: `ledgerops`.
+> GitHub repository: `leadgerops` (spelled as created). Frappe/Python app: `ledgerops`.
 
-## MVP scope
+## Implemented in this branch
 
-- Import bank and ledger CSV exports with an auditable import batch.
-- Normalize transaction rows and run deterministic reconciliation.
-- Surface unmatched, duplicate and amount/date-difference exceptions.
-- Request and attach supporting evidence to exceptions.
-- Assign, comment, resolve/reopen and reviewer-approve work.
-- Track status, ageing and month-end progress.
-- Optional AI drafts/explanations only; AI never calculates matches or posts accounting entries.
+- Frappe DocTypes: Client, Import Batch, Bank Transaction, Ledger Transaction, Match, Exception, Evidence Request and Audit Event.
+- CSV parser with date/amount/currency validation, source-row numbers, 5 MiB payload cap and 10,000-row cap.
+- CSV import API that records SHA-256 provenance and stages transactions.
+- Deterministic one-to-one matching: exact signed amount in minor units + currency + normalized reference + date tolerance.
+- Proposed matches and review exceptions for unmatched, ambiguous, amount/date differences and duplicate fingerprints.
+- Audit event creation for imports and completed reconciliations.
+- Pure-Python unit tests for normalization, matching and CSV parsing.
 
-## Architecture
+## API quick start
 
-- Frappe Framework custom app: DocTypes, authentication, roles/permissions, REST APIs, background jobs and UI.
-- MariaDB using the standard Frappe deployment path; Redis for queues/cache.
-- Private Frappe file storage for evidence (production object-storage integration is a deployment decision).
-- Cloudflare Workers AI behind a server-side adapter for optional text assistance.
-- ERPNext is optional. Do not fork or modify ERPNext core.
+Create a client (authenticated Frappe API user):
 
-## Repository layout
+```http
+POST /api/resource/LedgerOps%20Client
+Authorization: token <api_key>:<api_secret>
+Content-Type: application/json
 
-```
-ledgerops/
-├── ledgerops/
-│   ├── hooks.py
-│   ├── modules.txt
-│   └── ledgerops/
-│       ├── api/
-│       ├── doctype/
-│       └── services/
-├── docs/
-├── samples/
-└── tests/
+{"client_name":"Demo Client","accounting_system":"Excel","status":"Active"}
 ```
 
-## Development setup
+Import bank and ledger CSV content using POST JSON to:
 
-Use a Frappe Bench environment. Pin Frappe and ERPNext to the same supported major branch; the initial compatibility target is **Frappe/ERPNext v16**. Confirm the current v16 installation prerequisites on the official docs before provisioning a server.
+`/api/method/ledgerops.ledgerops.api.imports.import_csv`
+
+Request fields: `client`, `source_type` (`Bank Statement` or `Ledger Export`), `csv_text`, optional `source_filename`.
+
+Example payload:
+
+```json
+{
+  "client": "<client-document-name>",
+  "source_type": "Bank Statement",
+  "source_filename": "bank-october.csv",
+  "csv_text": "transaction_date,description,reference,debit,credit,currency\n2026-10-01,Customer payment,UTR-001,0.00,1250.00,INR\n"
+}
+```
+
+Call the same method with `source_type: "Ledger Export"` and the ledger CSV to create the second batch.
+
+Then POST to `/api/method/ledgerops.ledgerops.api.reconciliation.reconcile`:
+
+```json
+{
+  "bank_batch": "<bank-import-batch-name>",
+  "ledger_batch": "<ledger-import-batch-name>",
+  "date_window_days": 2
+}
+```
+
+Frappe exposes DocType CRUD at `/api/resource/<DocType>` and whitelisted methods at `/api/method/<dotted.path>`. See the [Frappe REST API guide](https://docs.frappe.io/framework/user/en/api/rest).
+
+## Important limitations
+
+- Current DocType permissions are restricted to the Frappe **System Manager** role. This is a developer/pilot scaffold, not the final firm/staff/client RBAC model.
+- The import endpoint accepts CSV text in a JSON request; it does not yet provide a browser upload UI or private File attachment workflow.
+- Synchronous import/reconciliation is capped at 10,000 rows per batch. Larger jobs need background workers and idempotent chunk processing.
+- Matching is deliberately conservative: no partial, one-to-many, many-to-many, FX, fuzzy or opposite-sign matching. Verify source accounting conventions before enabling automated matching.
+- The evidence request DocType exists, but client portal, secure evidence upload/download, email delivery and reviewer approval workflow are not implemented yet.
+- Tenant provisioning/isolation, production hardening, Frappe integration tests and deployment manifests remain open.
+- This branch has not been installed against a live Frappe v16 site in this environment. Run the Bench migration and app tests before treating it as deployable.
+
+## Development
+
+Use a Frappe Bench with Frappe v16 and optional ERPNext on the same major branch:
 
 ```bash
-# In a supported Frappe Bench directory
 bench get-app https://github.com/ARUNAGIRI011/leadgerops --branch bootstrap/ledgerops-mvp
 bench --site <site-name> install-app ledgerops
 bench --site <site-name> migrate
-bench --site <site-name> list-apps
+bench --site <site-name> run-tests --app ledgerops
 ```
 
-If creating a fresh bench, install the matching Frappe and (optionally) ERPNext v16 branches first. Never mix major branches.
+Pure Python tests:
 
-## Current implementation status
+```bash
+python -m pip install pytest
+python -m pytest -q tests
+```
 
-This bootstrap commit establishes the custom app package, product/architecture docs, deterministic matching service and starter tests. It is **not yet a production-ready SaaS**. CSV ingestion UI, full DocType workflows, tenant provisioning, permissions audit, notifications, AI adapter, deployment automation and end-to-end tests remain planned.
+Do not mix Frappe/ERPNext major branches. Confirm the current official installation matrix for Python, Node, MariaDB, Redis and OS packages before provisioning.
 
-## Design principles
+## Security
 
-1. Money/date matching is deterministic and testable; no LLM makes accounting decisions.
-2. Ambiguous matches go to human review.
-3. Store source rows and import-batch provenance; never silently overwrite imported data.
-4. Every state transition and reviewer action must be auditable.
-5. Firm data isolation must be enforced server-side, not by hiding UI fields.
-6. Start with synthetic data. Do not upload real PAN, Aadhaar or bank data to development/demo environments.
+Use synthetic data only during development. Keep API credentials server-side. Do not expose bank data, personal identifiers or evidence files publicly. The initial System Manager-only permissions are intentionally restrictive; implement and test tenant-aware roles before any customer pilot.
 
-## Documentation
+## Architecture and planning
 
-- [Product scope and roadmap](docs/roadmap.md)
 - [Architecture](docs/architecture.md)
 - [Data model](docs/data-model.md)
 - [Security baseline](docs/security.md)
-- [Local development and testing](docs/development.md)
+- [Product roadmap](docs/roadmap.md)
+- [Development guide](docs/development.md)
 
 ## License
 
-MIT for this custom app code. Frappe Framework and any optional ERPNext installation retain their own respective licenses. Review dependency and distribution obligations before commercial distribution.
+MIT for this custom app code. Frappe Framework and optional ERPNext retain their own licenses. Review dependency and distribution obligations before commercial distribution.
