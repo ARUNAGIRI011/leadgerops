@@ -40,7 +40,8 @@ def after_install():
                 # Reviewer can inspect source data but cannot edit/import it.
                 permissions = {**permissions, "write": 0, "create": 0}
             if doctype == "LedgerOps Audit Event":
-                permissions = {"read": 1, "write": 0, "create": 0, "delete": 0, "report": 1, "export": 0, "share": 0}
+                # API endpoints append audit events; roles cannot edit or delete them.
+                permissions = {"read": 1, "write": 0, "create": 1, "delete": 0, "report": 1, "export": 0, "share": 0}
             add_permission(doctype, role_name, 0)
             for ptype, value in permissions.items():
                 update_permission_property(doctype, role_name, 0, ptype, value)
