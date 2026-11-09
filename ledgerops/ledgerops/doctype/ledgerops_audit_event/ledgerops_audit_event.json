@@ -1,0 +1,70 @@
+{
+  "doctype": "DocType",
+  "name": "LedgerOps Audit Event",
+  "module": "LedgerOps",
+  "custom": 0,
+  "istable": 0,
+  "is_submittable": 0,
+  "is_tree": 0,
+  "editable_grid": 0,
+  "engine": "InnoDB",
+  "autoname": "hash",
+  "track_changes": 0,
+  "allow_rename": 0,
+  "fields": [
+    {
+      "fieldname": "actor",
+      "label": "Actor",
+      "fieldtype": "Link",
+      "options": "User",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "action",
+      "label": "Action",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "reference_doctype",
+      "label": "Reference DocType",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "reference_name",
+      "label": "Reference Name",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "details",
+      "label": "Details",
+      "fieldtype": "Small Text"
+    }
+  ],
+  "field_order": [
+    "actor",
+    "action",
+    "reference_doctype",
+    "reference_name",
+    "details"
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "create": 1,
+      "write": 0,
+      "delete": 0,
+      "share": 0,
+      "print": 1,
+      "export": 1
+    }
+  ],
+  "actions": [],
+  "links": [],
+  "states": []
+}
