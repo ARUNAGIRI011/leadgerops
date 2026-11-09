@@ -1,0 +1,120 @@
+{
+  "doctype": "DocType",
+  "name": "LedgerOps Exception",
+  "module": "LedgerOps",
+  "custom": 0,
+  "istable": 0,
+  "is_submittable": 0,
+  "is_tree": 0,
+  "editable_grid": 0,
+  "engine": "InnoDB",
+  "autoname": "hash",
+  "track_changes": 1,
+  "allow_rename": 0,
+  "fields": [
+    {
+      "fieldname": "client",
+      "label": "Client",
+      "fieldtype": "Link",
+      "options": "LedgerOps Client",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "import_batch",
+      "label": "Import Batch",
+      "fieldtype": "Link",
+      "options": "LedgerOps Import Batch"
+    },
+    {
+      "fieldname": "bank_transaction",
+      "label": "Bank Transaction",
+      "fieldtype": "Link",
+      "options": "LedgerOps Bank Transaction"
+    },
+    {
+      "fieldname": "ledger_transaction",
+      "label": "Ledger Transaction",
+      "fieldtype": "Link",
+      "options": "LedgerOps Ledger Transaction"
+    },
+    {
+      "fieldname": "exception_type",
+      "label": "Exception Type",
+      "fieldtype": "Select",
+      "options": "UNMATCHED_BANK\nUNMATCHED_LEDGER\nAMOUNT_DIFFERENCE\nDATE_DIFFERENCE\nAMBIGUOUS_MATCH\nDUPLICATE_BANK\nDUPLICATE_LEDGER",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "title",
+      "label": "Title",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "description",
+      "label": "Description",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Open\nIn Progress\nWaiting for Client\nResolved\nApproved\nReopened",
+      "default": "Open",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "priority",
+      "label": "Priority",
+      "fieldtype": "Select",
+      "options": "Low\nMedium\nHigh",
+      "default": "Medium",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "assigned_to",
+      "label": "Assigned To",
+      "fieldtype": "Link",
+      "options": "User"
+    },
+    {
+      "fieldname": "resolution_note",
+      "label": "Resolution Note",
+      "fieldtype": "Small Text"
+    }
+  ],
+  "field_order": [
+    "client",
+    "import_batch",
+    "bank_transaction",
+    "ledger_transaction",
+    "exception_type",
+    "title",
+    "description",
+    "status",
+    "priority",
+    "assigned_to",
+    "resolution_note"
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1,
+      "export": 1,
+      "report": 1,
+      "import": 1
+    }
+  ],
+  "actions": [],
+  "links": [],
+  "states": []
+}

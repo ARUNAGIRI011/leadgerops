@@ -1,0 +1,105 @@
+{
+  "doctype": "DocType",
+  "name": "LedgerOps Ledger Transaction",
+  "module": "LedgerOps",
+  "custom": 0,
+  "istable": 0,
+  "is_submittable": 0,
+  "is_tree": 0,
+  "editable_grid": 0,
+  "engine": "InnoDB",
+  "autoname": "hash",
+  "track_changes": 1,
+  "allow_rename": 0,
+  "fields": [
+    {
+      "fieldname": "import_batch",
+      "label": "Import Batch",
+      "fieldtype": "Link",
+      "options": "LedgerOps Import Batch",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "client",
+      "label": "Client",
+      "fieldtype": "Link",
+      "options": "LedgerOps Client",
+      "reqd": 1
+    },
+    {
+      "fieldname": "source_row_number",
+      "label": "Source Row Number",
+      "fieldtype": "Int",
+      "reqd": 1
+    },
+    {
+      "fieldname": "transaction_date",
+      "label": "Transaction Date",
+      "fieldtype": "Date",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "description",
+      "label": "Description",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "reference",
+      "label": "Reference",
+      "fieldtype": "Data",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "amount_minor",
+      "label": "Amount Minor Units",
+      "fieldtype": "Int",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Data",
+      "default": "INR",
+      "reqd": 1
+    },
+    {
+      "fieldname": "matched",
+      "label": "Matched",
+      "fieldtype": "Check",
+      "default": 0,
+      "in_list_view": 1
+    }
+  ],
+  "field_order": [
+    "import_batch",
+    "client",
+    "source_row_number",
+    "transaction_date",
+    "description",
+    "reference",
+    "amount_minor",
+    "currency",
+    "matched"
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1,
+      "export": 1,
+      "report": 1,
+      "import": 1
+    }
+  ],
+  "actions": [],
+  "links": [],
+  "states": []
+}
