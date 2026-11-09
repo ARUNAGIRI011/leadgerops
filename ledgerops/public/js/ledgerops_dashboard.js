@@ -12,8 +12,9 @@ frappe.pages["ledgerops-dashboard"].on_page_load = function(wrapper) {
             const d = r.message;
             const cards = [
                 ["Open exceptions", d.open_exceptions],
-                ["In review", d.in_review],
-                ["Resolved", d.resolved],
+                ["In progress", d.in_progress],
+                ["Waiting for client", d.waiting_for_client],
+                ["Resolved / approved", d.resolved],
                 ["Evidence items", d.evidence_items]
             ];
             const html = cards.map(([label, value]) =>
