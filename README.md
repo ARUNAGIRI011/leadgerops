@@ -20,6 +20,60 @@ Branch: `feature/desk-rbac-cloudflare-ai`
 - Private evidence register DocType and API to associate an already uploaded private Frappe File with an exception.
 - Install/migrate hooks create LedgerOps roles and permission records.
 
+## Public sales site and product-owner CRM
+
+This branch adds an early-access sales and customer-operations layer alongside the reconciliation product.
+
+### Public pages
+
+- `/ledgerops` — product landing page with workflow positioning and demo-request form.
+- `/privacy-policy` — early-access demo-request privacy notice template. It is not a complete legal privacy policy; the operating entity, contact, retention schedule, processors, transfer disclosures and applicable regional rights must be reviewed and completed before a public commercial launch.
+- The public form collects contact/business details only. It explicitly tells visitors not to submit bank statements, tax identifiers or customer financial records.
+- Guest endpoint: `POST /api/method/ledgerops.ledgerops.api.public_leads.submit_demo_request`.
+- Basic controls: required business email/company/name, explicit contact consent, honeypot, bounded input lengths and server-side per-IP throttling. Reverse-proxy IP trust must be configured before relying on IP throttling behind a proxy.
+
+### Internal CRM DocTypes
+
+- `LedgerOps Lead`: lead source, pipeline stage, owner, estimated monthly value, team/client counts and consent metadata.
+- `LedgerOps Account`: customer lifecycle, plan, MRR, renewal date and success owner.
+- `LedgerOps Contact`: customer contacts and preferred contact channel.
+- `LedgerOps CRM Activity`: calls, email, demos, meetings and tasks.
+- `LedgerOps Subscription`: plan, status, billing interval, amount and current period end.
+- `LedgerOps Support Case`: support queue, priority, category, assignment and resolution.
+
+### Product-owner console
+
+Desk route: `/app/ledgerops-owner`
+
+The console reports:
+- Leads, open leads, customers, active customers, subscriptions and open support cases.
+- MRR grouped by currency (not combined across currencies).
+- Open pipeline estimates grouped by currency (unweighted, not a forecast).
+- Lead stages, recent leads and upcoming subscription periods.
+
+Owner API: `GET /api/method/ledgerops.ledgerops.api.product_owner.get_overview`.
+
+Customer list API: `GET /api/method/ledgerops.ledgerops.api.product_owner.list_customers`.
+
+### CRM roles
+
+- `LedgerOps Product Owner`: full CRM visibility and owner dashboard API.
+- `LedgerOps Sales Manager`: lead/account/contact/activity/subscription/support visibility.
+- `LedgerOps Sales Representative`: leads, contacts and sales activities.
+- `LedgerOps Customer Success`: accounts, contacts, activities, subscriptions and support cases.
+- `LedgerOps Support Agent`: accounts, contacts and support cases.
+
+CRM roles are separate from the accounting-workflow roles. They do not grant access to accounting transactions. The product-owner API is role-gated. Assign roles only to authorized internal staff.
+
+### Important operating boundaries
+
+- This CRM is an internal operator CRM for the LedgerOps SaaS owner; it is not the customer-facing accounting firm's client portal.
+- Subscription records are operational records only. No payment gateway, invoicing, tax calculation, dunning or entitlement enforcement is implemented.
+- MRR is derived from manually maintained customer account records and grouped by currency. It is not verified against a payment provider or accounting ledger.
+- The landing page and demo form have not been tested on a live Frappe site.
+- Before public launch, complete legal/privacy review, configure verified email delivery and CAPTCHA/WAF protection, test abuse controls behind the actual reverse proxy, and publish the real privacy contact.
+- Add automated tests for lead capture, consent, duplicate updates, rate limits, CRM role access and dashboard aggregation before production.
+
 ## Cloudflare Workers AI setup
 
 Configure the following values in the Frappe site's `site_config.json` using `bench --site <site-name> set-config`:
