@@ -2,5 +2,5 @@ import frappe
 from frappe.model.document import Document
 
 
-class LedgeropsClient(Document):
+class LedgerOpsClient(Document):
     pass
