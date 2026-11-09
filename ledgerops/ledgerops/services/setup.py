@@ -2,7 +2,7 @@
 import frappe
 from frappe.permissions import add_permission, update_permission_property
 
-ROLE_NAMES = ("LedgerOps Admin", "LedgerOps Manager", "LedgerOps Accountant", "LedgerOps Reviewer")
+ROLE_NAMES = ("LedgerOps Admin", "LedgerOps Manager", "LedgerOps Accountant", "LedgerOps Reviewer", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative", "LedgerOps Customer Success", "LedgerOps Support Agent")
 DOCTYPE_NAMES = (
     "LedgerOps Client",
     "LedgerOps Import Batch",
@@ -13,6 +13,12 @@ DOCTYPE_NAMES = (
     "LedgerOps Evidence Request",
     "LedgerOps Evidence",
     "LedgerOps Audit Event",
+    "LedgerOps Lead",
+    "LedgerOps Account",
+    "LedgerOps Contact",
+    "LedgerOps CRM Activity",
+    "LedgerOps Subscription",
+    "LedgerOps Support Case",
 )
 
 # One Frappe site per accounting firm is the MVP tenant boundary. These roles
@@ -45,6 +51,16 @@ def after_install():
             add_permission(doctype, role_name, 0)
             for ptype, value in permissions.items():
                 update_permission_property(doctype, role_name, 0, ptype, value)
+
+    if not frappe.db.exists("Page", "ledgerops-owner"):
+        frappe.get_doc({
+            "doctype": "Page",
+            "page_name": "ledgerops-owner",
+            "title": "LedgerOps Owner Console",
+            "module": "LedgerOps",
+            "standard": "Yes",
+            "system_page": 0,
+        }).insert(ignore_permissions=True)
 
     if not frappe.db.exists("Page", "ledgerops-dashboard"):
         frappe.get_doc({
