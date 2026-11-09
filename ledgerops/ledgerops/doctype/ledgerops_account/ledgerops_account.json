@@ -56,8 +56,7 @@
     {
       "fieldname": "currency",
       "label": "Billing Currency",
-      "fieldtype": "Link",
-      "options": "Currency",
+      "fieldtype": "Data",
       "default": "INR"
     },
     {
