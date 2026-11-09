@@ -39,15 +39,13 @@ def _to_transaction(row) -> Transaction:
     )
 
 
-def _create_exception(client, batch, txn, side, exception_type, title, description):
-    bank_link = txn.transaction_id if side == "bank" else None
-    ledger_link = txn.transaction_id if side == "ledger" else None
+def _create_exception(client, batch, exception_type, title, description, bank_id=None, ledger_id=None):
     doc = frappe.get_doc({
         "doctype": "LedgerOps Exception",
         "client": client,
         "import_batch": batch,
-        "bank_transaction": bank_link,
-        "ledger_transaction": ledger_link,
+        "bank_transaction": bank_id,
+        "ledger_transaction": ledger_id,
         "exception_type": exception_type,
         "title": title[:140],
         "description": description[:2000],
@@ -62,8 +60,8 @@ def reconcile(bank_batch: str, ledger_batch: str, date_window_days: int = 0):
     """Reconcile two imported batches; creates proposed matches and review exceptions.
 
     POST /api/method/ledgerops.ledgerops.api.reconciliation.reconcile
-    Matches require a unique exact amount + currency + normalized reference
-    within the date window. No partial, many-to-many, FX or fuzzy matching.
+    Exact unique matches only: signed amount + currency + normalized reference
+    + date window. No partial, many-to-many, FX or fuzzy matching.
     """
     try:
         window = int(date_window_days)
@@ -108,7 +106,6 @@ def reconcile(bank_batch: str, ledger_batch: str, date_window_days: int = 0):
     matched_bank = {m.bank_transaction_id for m in candidates}
     matched_ledger = {m.ledger_transaction_id for m in candidates}
 
-    created_matches = 0
     for candidate in candidates:
         frappe.get_doc({
             "doctype": "LedgerOps Match",
@@ -120,79 +117,90 @@ def reconcile(bank_batch: str, ledger_batch: str, date_window_days: int = 0):
         }).insert()
         frappe.db.set_value("LedgerOps Bank Transaction", candidate.bank_transaction_id, "matched", 1)
         frappe.db.set_value("LedgerOps Ledger Transaction", candidate.ledger_transaction_id, "matched", 1)
-        created_matches += 1
 
-    bank_by_id = {t.transaction_id: t for t in banks}
-    ledger_by_id = {t.transaction_id: t for t in ledgers}
     ledger_refs = defaultdict(list)
     bank_refs = defaultdict(list)
-    for t in ledgers:
-        ref = normalize_reference(t.reference)
+    for txn in ledgers:
+        ref = normalize_reference(txn.reference)
         if ref:
-            ledger_refs[ref].append(t)
-    for t in banks:
-        ref = normalize_reference(t.reference)
+            ledger_refs[ref].append(txn)
+    for txn in banks:
+        ref = normalize_reference(txn.reference)
         if ref:
-            bank_refs[ref].append(t)
+            bank_refs[ref].append(txn)
 
-    exception_count = 0
     duplicate_bank = find_duplicate_fingerprints(banks)
     duplicate_ledger = find_duplicate_fingerprints(ledgers)
     duplicate_bank_ids = {name for ids in duplicate_bank.values() for name in ids}
     duplicate_ledger_ids = {name for ids in duplicate_ledger.values() for name in ids}
+    handled_ledger_ids = set()
+    exceptions_created = 0
 
+    # Create one linked exception for a clear amount/date mismatch rather than
+    # creating duplicate work items on both sides of the same discrepancy.
     for txn in banks:
         if txn.transaction_id in matched_bank:
             continue
+        ref = normalize_reference(txn.reference)
+        counterparts = ledger_refs.get(ref, []) if ref else []
         if txn.transaction_id in duplicate_bank_ids:
             kind, title = "DUPLICATE_BANK", "Possible duplicate bank transaction"
-        else:
-            ref = normalize_reference(txn.reference)
-            candidates_for_ref = ledger_refs.get(ref, []) if ref else []
-            if len(candidates_for_ref) > 1:
-                kind, title = "AMBIGUOUS_MATCH", "Multiple ledger candidates"
-            elif candidates_for_ref and candidates_for_ref[0].currency == txn.currency and candidates_for_ref[0].amount_minor != txn.amount_minor:
-                kind, title = "AMOUNT_DIFFERENCE", "Bank and ledger amounts differ"
-            elif candidates_for_ref and candidates_for_ref[0].amount_minor == txn.amount_minor and abs((candidates_for_ref[0].transaction_date - txn.transaction_date).days) > window:
-                kind, title = "DATE_DIFFERENCE", "Bank and ledger dates differ"
+            ledger_id = None
+        elif len(counterparts) > 1:
+            kind, title = "AMBIGUOUS_MATCH", "Multiple ledger candidates"
+            handled_ledger_ids.update(item.transaction_id for item in counterparts)
+            ledger_id = None
+        elif len(counterparts) == 1:
+            other = counterparts[0]
+            if other.transaction_id in matched_ledger:
+                kind, title, ledger_id = "UNMATCHED_BANK", "No available ledger match", None
+            elif other.currency == txn.currency and other.amount_minor != txn.amount_minor:
+                kind, title, ledger_id = "AMOUNT_DIFFERENCE", "Bank and ledger amounts differ", other.transaction_id
+                handled_ledger_ids.add(other.transaction_id)
+            elif other.currency == txn.currency and other.amount_minor == txn.amount_minor and abs((other.transaction_date - txn.transaction_date).days) > window:
+                kind, title, ledger_id = "DATE_DIFFERENCE", "Bank and ledger dates differ", other.transaction_id
+                handled_ledger_ids.add(other.transaction_id)
             else:
-                kind, title = "UNMATCHED_BANK", "No exact ledger match"
-        description = f"Bank row {txn.transaction_id}; date={txn.transaction_date}; amount_minor={txn.amount_minor}; currency={txn.currency}; reference={txn.reference}"
-        _create_exception(bank_doc.client, bank_batch, txn, "bank", kind, title, description)
-        exception_count += 1
+                kind, title, ledger_id = "UNMATCHED_BANK", "No exact ledger match", None
+        else:
+            kind, title, ledger_id = "UNMATCHED_BANK", "No exact ledger match", None
+        details = f"Bank row {txn.transaction_id}; date={txn.transaction_date}; amount_minor={txn.amount_minor}; currency={txn.currency}; reference={txn.reference}"
+        if ledger_id:
+            other = next(item for item in counterparts if item.transaction_id == ledger_id)
+            details += f" | Ledger row {other.transaction_id}; date={other.transaction_date}; amount_minor={other.amount_minor}; currency={other.currency}"
+        _create_exception(bank_doc.client, bank_batch, kind, title, details,
+                          bank_id=txn.transaction_id, ledger_id=ledger_id)
+        exceptions_created += 1
 
     for txn in ledgers:
-        if txn.transaction_id in matched_ledger:
+        if txn.transaction_id in matched_ledger or txn.transaction_id in handled_ledger_ids:
             continue
         if txn.transaction_id in duplicate_ledger_ids:
             kind, title = "DUPLICATE_LEDGER", "Possible duplicate ledger transaction"
         else:
             ref = normalize_reference(txn.reference)
-            candidates_for_ref = bank_refs.get(ref, []) if ref else []
-            if len(candidates_for_ref) > 1:
+            counterparts = bank_refs.get(ref, []) if ref else []
+            if len(counterparts) > 1:
                 kind, title = "AMBIGUOUS_MATCH", "Multiple bank candidates"
-            elif candidates_for_ref and candidates_for_ref[0].currency == txn.currency and candidates_for_ref[0].amount_minor != txn.amount_minor:
-                kind, title = "AMOUNT_DIFFERENCE", "Ledger and bank amounts differ"
-            elif candidates_for_ref and candidates_for_ref[0].amount_minor == txn.amount_minor and abs((candidates_for_ref[0].transaction_date - txn.transaction_date).days) > window:
-                kind, title = "DATE_DIFFERENCE", "Ledger and bank dates differ"
             else:
                 kind, title = "UNMATCHED_LEDGER", "No exact bank match"
-        description = f"Ledger row {txn.transaction_id}; date={txn.transaction_date}; amount_minor={txn.amount_minor}; currency={txn.currency}; reference={txn.reference}"
-        _create_exception(ledger_doc.client, ledger_batch, txn, "ledger", kind, title, description)
-        exception_count += 1
+        details = f"Ledger row {txn.transaction_id}; date={txn.transaction_date}; amount_minor={txn.amount_minor}; currency={txn.currency}; reference={txn.reference}"
+        _create_exception(ledger_doc.client, ledger_batch, kind, title, details,
+                          ledger_id=txn.transaction_id)
+        exceptions_created += 1
 
     bank_doc.status = "Reconciled"
     bank_doc.save()
     ledger_doc.status = "Reconciled"
     ledger_doc.save()
     _audit("RECONCILIATION_COMPLETED", "LedgerOps Import Batch", bank_batch,
-           f"ledger_batch={ledger_batch}; matches={created_matches}; exceptions={exception_count}; date_window_days={window}")
+           f"ledger_batch={ledger_batch}; matches={len(candidates)}; exceptions={exceptions_created}; date_window_days={window}")
 
     return {
         "bank_batch": bank_batch,
         "ledger_batch": ledger_batch,
-        "proposed_matches": created_matches,
-        "exceptions_created": exception_count,
+        "proposed_matches": len(candidates),
+        "exceptions_created": exceptions_created,
         "date_window_days": window,
-        "matching_rule": "unique exact amount + currency + normalized reference + date window",
+        "matching_rule": "unique exact signed amount + currency + normalized reference + date window",
     }
