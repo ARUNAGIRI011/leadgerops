@@ -16,6 +16,12 @@ def register_evidence(exception_name: str, file_url: str, file_label: str, notes
     file_doc = frappe.get_doc("File", file_name)
     if not file_doc.is_private:
         frappe.throw(_("Evidence must be uploaded as a private file"))
+    if file_doc.owner != frappe.session.user and "System Manager" not in frappe.get_roles():
+        frappe.throw(_("You can register only evidence files that you uploaded"), frappe.PermissionError)
+    if file_doc.attached_to_doctype == "LedgerOps Exception" and file_doc.attached_to_name != exception.name:
+        frappe.throw(_("Evidence file is attached to a different exception"), frappe.PermissionError)
+    if file_doc.attached_to_doctype not in (None, "", "LedgerOps Exception"):
+        frappe.throw(_("Evidence file is already linked to another document"), frappe.PermissionError)
 
     evidence = frappe.get_doc({
         "doctype": "LedgerOps Evidence",
