@@ -14,9 +14,9 @@ MAX_OUTPUT_TOKENS = 700
 
 def _redact_free_text(value: str) -> str:
     """Best-effort masking for common identifiers before external inference."""
-    value = re.sub(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}", "[redacted-email]", value, flags=re.I)
-    value = re.sub(r"(?<!\\w)(?:\\+?\\d[\\d .()/-]{8,}\\d)(?!\\w)", "[redacted-number]", value)
-    value = re.sub(r"\\b\\d{8,}\\b", "[redacted-number]", value)
+    value = re.sub(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+[.][A-Z]{2,}", "[redacted-email]", value, flags=re.I)
+    value = re.sub(r"(^|[^A-Za-z0-9])(?:[+]?[0-9][0-9 .()/-]{8,}[0-9])($|[^A-Za-z0-9])", "[redacted-number]", value)
+    value = re.sub(r"[0-9]{8,}", "[redacted-number]", value)
     return value[:MAX_INPUT_CHARS]
 
 
