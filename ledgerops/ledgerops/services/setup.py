@@ -17,20 +17,51 @@ ACCOUNTING_DOCTYPES = (
     "LedgerOps Ledger Transaction", "LedgerOps Match", "LedgerOps Exception",
     "LedgerOps Evidence Request", "LedgerOps Evidence", "LedgerOps Audit Event",
 )
-CRM_DOCTYPES = (
-    "LedgerOps Lead", "LedgerOps Account", "LedgerOps Contact",
-    "LedgerOps CRM Activity", "LedgerOps Subscription", "LedgerOps Support Case",
-)
 FULL = {"read": 1, "write": 1, "create": 1, "delete": 0, "report": 1, "export": 0, "share": 0}
 READ_ONLY = {"read": 1, "write": 0, "create": 0, "delete": 0, "report": 1, "export": 0, "share": 0}
 
+# Fail closed for Sales Representatives until owner-scoped list/document permission
+# hooks and tests are implemented. Giving DocType-wide read access would expose
+# every lead in the CRM, not just the representative's assigned leads.
 CRM_ACCESS = {
-    "LedgerOps Lead": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative"),
-    "LedgerOps Account": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success", "LedgerOps Support Agent"),
-    "LedgerOps Contact": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative", "LedgerOps Customer Success", "LedgerOps Support Agent"),
-    "LedgerOps CRM Activity": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative", "LedgerOps Customer Success"),
-    "LedgerOps Subscription": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success"),
-    "LedgerOps Support Case": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success", "LedgerOps Support Agent"),
+    "LedgerOps Lead": {
+        "LedgerOps Admin": FULL,
+        "LedgerOps Product Owner": FULL,
+        "LedgerOps Sales Manager": FULL,
+    },
+    "LedgerOps Account": {
+        "LedgerOps Admin": FULL,
+        "LedgerOps Product Owner": FULL,
+        "LedgerOps Sales Manager": FULL,
+        "LedgerOps Customer Success": FULL,
+        "LedgerOps Support Agent": READ_ONLY,
+    },
+    "LedgerOps Contact": {
+        "LedgerOps Admin": FULL,
+        "LedgerOps Product Owner": FULL,
+        "LedgerOps Sales Manager": FULL,
+        "LedgerOps Customer Success": FULL,
+        "LedgerOps Support Agent": READ_ONLY,
+    },
+    "LedgerOps CRM Activity": {
+        "LedgerOps Admin": FULL,
+        "LedgerOps Product Owner": FULL,
+        "LedgerOps Sales Manager": FULL,
+        "LedgerOps Customer Success": FULL,
+    },
+    "LedgerOps Subscription": {
+        "LedgerOps Admin": FULL,
+        "LedgerOps Product Owner": FULL,
+        "LedgerOps Sales Manager": READ_ONLY,
+        "LedgerOps Customer Success": READ_ONLY,
+    },
+    "LedgerOps Support Case": {
+        "LedgerOps Admin": FULL,
+        "LedgerOps Product Owner": FULL,
+        "LedgerOps Sales Manager": FULL,
+        "LedgerOps Customer Success": FULL,
+        "LedgerOps Support Agent": FULL,
+    },
 }
 
 
@@ -59,9 +90,9 @@ def after_install():
                 permissions = {"read": 1, "write": 0, "create": 1, "delete": 0, "report": 1, "export": 0, "share": 0}
             _grant(doctype, role, permissions)
 
-    for doctype, roles in CRM_ACCESS.items():
-        for role in roles:
-            _grant(doctype, role, FULL)
+    for doctype, role_permissions in CRM_ACCESS.items():
+        for role, permissions in role_permissions.items():
+            _grant(doctype, role, permissions)
 
     for page_name, title in (
         ("ledgerops-owner", "LedgerOps Owner Console"),
