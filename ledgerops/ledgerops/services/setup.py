@@ -73,7 +73,7 @@ def after_install():
                 "page_name": page_name,
                 "title": title,
                 "module": "LedgerOps",
-                "standard": "Yes",
+                "standard": "No",
                 "system_page": 0,
             }).insert(ignore_permissions=True)
 
