@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import requests
 import frappe
 from frappe import _
@@ -9,6 +10,14 @@ from frappe import _
 DEFAULT_MODEL = "@cf/zai-org/glm-4.7-flash"
 MAX_INPUT_CHARS = 6000
 MAX_OUTPUT_TOKENS = 700
+
+
+def _redact_free_text(value: str) -> str:
+    """Best-effort masking for common identifiers before external inference."""
+    value = re.sub(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}", "[redacted-email]", value, flags=re.I)
+    value = re.sub(r"(?<!\\w)(?:\\+?\\d[\\d .()/-]{8,}\\d)(?!\\w)", "[redacted-number]", value)
+    value = re.sub(r"\\b\\d{8,}\\b", "[redacted-number]", value)
+    return value[:MAX_INPUT_CHARS]
 
 
 def _config(name, default=None):
@@ -30,7 +39,7 @@ def generate_exception_assistance(exception_doc, task: str) -> dict:
     safe_context = {
         "exception_type": str(exception_doc.exception_type or "")[:80],
         "title": str(exception_doc.title or "")[:200],
-        "description": str(exception_doc.description or "")[:MAX_INPUT_CHARS],
+        "description": _redact_free_text(str(exception_doc.description or "")),
         "status": str(exception_doc.status or "")[:40],
         "priority": str(exception_doc.priority or "")[:30],
     }
