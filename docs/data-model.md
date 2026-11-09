@@ -1,19 +1,24 @@
-# Initial data model
+# Implemented initial data model
 
-Planned Frappe DocTypes (the list is design intent; DocType schemas and permission matrices are not yet implemented):
+The current branch contains these Frappe DocTypes:
 
-| DocType | Purpose | Key fields |
+| DocType | Purpose | Main fields |
 |---|---|---|
-| LedgerOps Firm | Tenant / practice | firm name, status, external tenant key |
-| LedgerOps Client | Customer entity | firm, display name, contact, accounting system |
-| LedgerOps Engagement | Period of work | firm, client, period start/end, status |
-| LedgerOps Import Batch | Source provenance | firm, client, source type, file, checksum, status, counts |
-| LedgerOps Bank Transaction | Imported bank row | batch, source row, date, amount_minor, currency, reference |
-| LedgerOps Ledger Transaction | Imported ledger row | batch, source row, date, amount_minor, currency, reference |
-| LedgerOps Match | Proposed/confirmed relation | bank row, ledger row, rule, reviewer, status |
-| LedgerOps Exception | Work item | type, severity, status, owner, due date, match candidates |
-| LedgerOps Evidence Request | Client request | exception, requested items, due date, status |
-| LedgerOps Evidence | Private file metadata | request, exception, file, uploaded by, checksum |
-| LedgerOps Audit Event | Append-only history | actor, action, target, timestamp, reason |
+| LedgerOps Client | Client/customer master | name, email, phone, accounting system, status |
+| LedgerOps Import Batch | Import provenance | client, source type, status, filename, SHA-256, row count |
+| LedgerOps Bank Transaction | Staged bank row | batch, client, source row, date, description, reference, signed minor units, currency |
+| LedgerOps Ledger Transaction | Staged ledger row | batch, client, source row, date, description, reference, signed minor units, currency |
+| LedgerOps Match | Proposed reconciliation | bank row, ledger row, rule, confidence, status |
+| LedgerOps Exception | Review work item | client, batch, linked transaction, type, title, status, priority, assignee, resolution note |
+| LedgerOps Evidence Request | Evidence request record | client, exception, request text, due date, status, attachment field |
+| LedgerOps Audit Event | Audit record | actor, action, referenced DocType/name, details |
 
-All tenant-owned records must have a server-enforced firm relationship. Never trust a client-supplied firm identifier without checking the authenticated user's membership. Do not expose private evidence files through public URLs.
+## Security and tenancy boundary
+
+At this stage all DocTypes are restricted to the Frappe System Manager role. This is intentionally restrictive and is not a customer-ready RBAC design. A single Frappe site should be treated as one firm boundary for the current pilot scaffold. Do not host multiple unrelated firms in one site until firm membership and server-side tenant filters are implemented and security-tested.
+
+## Matching representation
+
+Transaction amount is stored as integer minor units (e.g. paise). CSV credit values are positive and debit values are negative. Currency is an ISO-style three-letter alphabetic code validated by the importer. Confirm each source export's debit/credit convention before relying on matches.
+
+The current schema uses an integer field for minor units. Its maximum numeric range must be validated against the deployed MariaDB/Frappe field mapping; if transactions can exceed that range, migrate to a decimal-safe or bigint representation before production.
