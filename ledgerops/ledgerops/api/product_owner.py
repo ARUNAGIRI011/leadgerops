@@ -74,7 +74,7 @@ def list_customers(search: str = "", lifecycle_status: str = "", limit_start: in
         filters["lifecycle_status"] = lifecycle_status
     or_filters = None
     if search:
-        term = "%" + frappe.db.escape(search.strip()[:80], percent=True) + "%"
+        term = "%" + search.strip()[:80] + "%"
         or_filters = [
             ["LedgerOps Account", "account_name", "like", term],
             ["LedgerOps Account", "primary_email", "like", term],
