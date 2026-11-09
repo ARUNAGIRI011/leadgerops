@@ -64,8 +64,7 @@
     {
       "fieldname": "currency",
       "label": "Currency",
-      "fieldtype": "Link",
-      "options": "Currency",
+      "fieldtype": "Data",
       "default": "INR"
     },
     {
