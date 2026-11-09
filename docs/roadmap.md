@@ -1,25 +1,21 @@
 # Product scope and roadmap
 
-## Target workflow
+## Implemented in current bootstrap branch
 
-1. Firm staff creates a client and accounting period/engagement.
-2. Staff uploads bank statement and ledger export.
-3. Import preview validates columns, dates, currencies and row counts.
-4. Deterministic engine proposes unique matches and raises exceptions for unmatched/ambiguous/duplicate/difference cases.
-5. Staff requests evidence from the client and links uploaded files to the exception.
-6. Preparer resolves; reviewer approves; audit history records each action.
-7. Firm views exception ageing and period close status.
+- Frappe DocTypes for clients, import batches, staged bank/ledger rows, proposed matches, exceptions, evidence requests and audit events.
+- CSV text parser with date, amount and currency validation, SHA-256 batch provenance and source-row numbering.
+- Deterministic one-to-one matching by unique exact signed amount, currency, normalized reference and date window.
+- Exceptions for unmatched rows, ambiguity, amount/date differences and duplicate fingerprints.
+- Starter pure-Python tests for parser and matching services.
 
-## MVP P0
+## Next P0 work
 
-- Firm/client/team and role model.
-- Import batch, CSV mapping and validation preview.
-- Bank/ledger transaction staging with source-row provenance.
-- Deterministic one-to-one matching using integer minor units.
-- Exceptions for unmatched, duplicates, and amount/date differences.
-- Evidence request, private attachment and assignment.
-- Status transitions, reviewer approval and immutable audit events.
-- Period dashboard and exportable close report.
+1. Install/migrate on a real Frappe v16 bench and validate every DocType JSON/controller.
+2. Add firm/site provisioning, staff roles and permission tests; replace System Manager-only access.
+3. Build Desk UI for imports, exception queues, assignments, comments, evidence requests and reviewer approvals.
+4. Implement private evidence upload/download with authorization checks and audit trail.
+5. Add background/chunked import and reconciliation with idempotency and retry safety.
+6. Add Frappe integration tests, CI execution and backup/restore tests.
 
 ## P1
 
@@ -30,12 +26,11 @@
 
 ## P2
 
-- OCR/document extraction, advanced analytics, multi-entity consolidation.
+- OCR/document extraction, advanced analytics and multi-entity consolidation.
 
 ## Explicitly out of scope
 
-- General ledger, journal posting, tax filing, statutory audit opinion, investment advice.
-- LLM-based reconciliation decisions or autonomous posting.
+General ledger, journal posting, tax filing, statutory audit opinion, investment advice, LLM-based reconciliation decisions and autonomous posting.
 
 ## Validation gates (proposed, not market benchmarks)
 
