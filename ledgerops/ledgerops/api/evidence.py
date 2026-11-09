@@ -10,9 +10,13 @@ def register_evidence(exception_name: str, file_url: str, file_label: str, notes
         frappe.throw(_("You do not have permission to register evidence"), frappe.PermissionError)
     exception = frappe.get_doc("LedgerOps Exception", exception_name)
     exception.check_permission("read")
-    file_doc = frappe.get_doc("File", {"file_url": file_url})
+    file_name = frappe.db.get_value("File", {"file_url": file_url}, "name")
+    if not file_name:
+        frappe.throw(_("Uploaded file record was not found"))
+    file_doc = frappe.get_doc("File", file_name)
     if not file_doc.is_private:
         frappe.throw(_("Evidence must be uploaded as a private file"))
+
     evidence = frappe.get_doc({
         "doctype": "LedgerOps Evidence",
         "exception": exception.name,
@@ -21,6 +25,11 @@ def register_evidence(exception_name: str, file_url: str, file_label: str, notes
         "notes": notes[:1000],
     })
     evidence.insert()
+    file_doc.db_set({
+        "attached_to_doctype": "LedgerOps Evidence",
+        "attached_to_name": evidence.name,
+        "attached_to_field": "file",
+    })
     frappe.get_doc({
         "doctype": "LedgerOps Audit Event",
         "actor": frappe.session.user,
