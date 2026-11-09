@@ -25,12 +25,12 @@ FULL = {"read": 1, "write": 1, "create": 1, "delete": 0, "report": 1, "export": 
 READ_ONLY = {"read": 1, "write": 0, "create": 0, "delete": 0, "report": 1, "export": 0, "share": 0}
 
 CRM_ACCESS = {
-    "LedgerOps Lead": ("LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative"),
-    "LedgerOps Account": ("LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success", "LedgerOps Support Agent"),
-    "LedgerOps Contact": ("LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative", "LedgerOps Customer Success", "LedgerOps Support Agent"),
-    "LedgerOps CRM Activity": ("LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative", "LedgerOps Customer Success"),
-    "LedgerOps Subscription": ("LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success"),
-    "LedgerOps Support Case": ("LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success", "LedgerOps Support Agent"),
+    "LedgerOps Lead": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative"),
+    "LedgerOps Account": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success", "LedgerOps Support Agent"),
+    "LedgerOps Contact": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative", "LedgerOps Customer Success", "LedgerOps Support Agent"),
+    "LedgerOps CRM Activity": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Sales Representative", "LedgerOps Customer Success"),
+    "LedgerOps Subscription": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success"),
+    "LedgerOps Support Case": ("LedgerOps Admin", "LedgerOps Product Owner", "LedgerOps Sales Manager", "LedgerOps Customer Success", "LedgerOps Support Agent"),
 }
 
 
