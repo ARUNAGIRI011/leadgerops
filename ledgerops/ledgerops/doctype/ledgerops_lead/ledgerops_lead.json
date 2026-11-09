@@ -1,0 +1,120 @@
+{
+  "doctype": "DocType",
+  "name": "LedgerOps Lead",
+  "module": "LedgerOps",
+  "autoname": "format:LEA-{####}",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "lead_name",
+      "label": "Lead / Company Name",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "email",
+      "label": "Business Email",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "phone",
+      "label": "Phone",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "country",
+      "label": "Country",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "source",
+      "label": "Source",
+      "fieldtype": "Select",
+      "options": "Website\nReferral\nLinkedIn\nPartner\nOther",
+      "default": "Website"
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "New\nContacted\nQualified\nDemo Scheduled\nProposal\nWon\nLost",
+      "default": "New",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "owner",
+      "label": "Assigned To",
+      "fieldtype": "Link",
+      "options": "User"
+    },
+    {
+      "fieldname": "estimated_monthly_value",
+      "label": "Estimated Monthly Value",
+      "fieldtype": "Currency"
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Data",
+      "default": "INR"
+    },
+    {
+      "fieldname": "team_size",
+      "label": "Accounting Team Size",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "client_count",
+      "label": "Managed Client Count",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "pain_points",
+      "label": "Workflow / Pain Points",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "notes",
+      "label": "Internal Notes",
+      "fieldtype": "Text"
+    },
+    {
+      "fieldname": "consent_to_contact",
+      "label": "Consent to Contact",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "privacy_notice_version",
+      "label": "Privacy Notice Version",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "converted_customer",
+      "label": "Converted Customer",
+      "fieldtype": "Link",
+      "options": "LedgerOps Account"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0,
+      "report": 1,
+      "export": 0,
+      "share": 0
+    }
+  ]
+}

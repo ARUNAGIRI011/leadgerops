@@ -14,4 +14,5 @@ doctype_js = {
 }
 page_js = {
     "ledgerops-dashboard": "public/js/ledgerops_dashboard.js",
+    "ledgerops-owner": "public/js/product_owner_dashboard.js",
 }

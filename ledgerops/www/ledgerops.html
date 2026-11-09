@@ -1,0 +1,80 @@
+{% extends "templates/web.html" %}
+{% block title %}LedgerOps — Reconciliation exception management{% endblock %}
+{% block page_content %}
+<style>
+:root{--lo-ink:#152238;--lo-muted:#617086;--lo-line:#e5eaf1;--lo-blue:#2857d9;--lo-bg:#f7f9fc}
+.lo-site{color:var(--lo-ink);font-family:Inter,system-ui,sans-serif}.lo-nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0}.lo-brand{font-weight:800;font-size:22px;letter-spacing:-.7px}.lo-brand span{color:var(--lo-blue)}.lo-btn{display:inline-block;background:var(--lo-blue);color:#fff!important;padding:13px 20px;border-radius:10px;font-weight:650;text-decoration:none;border:0}.lo-btn.alt{background:#eef2ff;color:var(--lo-blue)!important}.lo-hero{padding:72px 0 60px;display:grid;grid-template-columns:1.1fr .9fr;gap:42px;align-items:center}.lo-kicker{color:var(--lo-blue);font-weight:750;letter-spacing:1.4px;text-transform:uppercase;font-size:12px}.lo-hero h1{font-size:clamp(38px,5vw,60px);line-height:1.06;letter-spacing:-2.5px;font-weight:800;margin:18px 0}.lo-hero p{font-size:18px;line-height:1.65;color:var(--lo-muted);max-width:650px}.lo-panel{background:#fff;border:1px solid var(--lo-line);border-radius:18px;padding:22px;box-shadow:0 18px 50px #182c4b12}.lo-mini{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}.lo-stat{background:var(--lo-bg);border-radius:12px;padding:16px}.lo-stat b{display:block;font-size:22px}.lo-stat small{color:var(--lo-muted)}.lo-section{padding:64px 0;border-top:1px solid var(--lo-line)}.lo-section h2{font-size:34px;letter-spacing:-1px;font-weight:780}.lo-muted{color:var(--lo-muted)}.lo-features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:28px}.lo-feature{border:1px solid var(--lo-line);border-radius:14px;padding:22px;background:white}.lo-feature h3{font-size:18px;font-weight:700}.lo-cta{display:grid;grid-template-columns:1fr .9fr;gap:35px;align-items:start}.lo-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.lo-form label{font-size:13px;font-weight:650}.lo-form input,.lo-form textarea,.lo-form select{display:block;width:100%;border:1px solid #d8e0ea;border-radius:9px;padding:11px;margin-top:6px}.lo-form .full{grid-column:1/-1}.lo-form button{cursor:pointer}.lo-form .consent{display:flex;gap:8px;align-items:flex-start;font-weight:450}.lo-form .consent input{width:auto;margin:3px 0}.lo-footer{padding:28px 0;border-top:1px solid var(--lo-line);color:var(--lo-muted);font-size:13px}
+@media(max-width:760px){.lo-hero,.lo-cta{grid-template-columns:1fr}.lo-hero{padding:42px 0}.lo-features{grid-template-columns:1fr}.lo-form{grid-template-columns:1fr}.lo-form .full{grid-column:auto}}
+</style>
+<div class="lo-site">
+  <div class="lo-nav"><div class="lo-brand">Ledger<span>Ops</span></div><a class="lo-btn alt" href="#demo">Request a demo</a></div>
+  <section class="lo-hero">
+    <div>
+      <div class="lo-kicker">Built for accounting and bookkeeping teams</div>
+      <h1>Close your books with fewer unanswered questions.</h1>
+      <p>LedgerOps helps accounting teams resolve reconciliation exceptions, collect supporting evidence, assign follow-ups and keep month-end work reviewable — alongside the accounting software you already use.</p>
+      <a class="lo-btn" href="#demo">See LedgerOps in action</a>
+      <a class="lo-btn alt" style="margin-left:8px" href="#workflow">Explore workflow</a>
+    </div>
+    <div class="lo-panel">
+      <div class="lo-kicker">One clear exception workflow</div>
+      <h3 style="font-weight:750;margin-top:10px">From unmatched item to reviewed evidence</h3>
+      <div class="lo-mini">
+        <div class="lo-stat"><b>01</b><small>Import statements</small></div>
+        <div class="lo-stat"><b>02</b><small>Identify exceptions</small></div>
+        <div class="lo-stat"><b>03</b><small>Request evidence</small></div>
+        <div class="lo-stat"><b>04</b><small>Review and close</small></div>
+      </div>
+      <p class="lo-muted" style="font-size:13px;margin-top:18px">A workflow layer — not a replacement for your ledger, tax software or accounting system.</p>
+    </div>
+  </section>
+  <section id="workflow" class="lo-section">
+    <div class="lo-kicker">The reconciliation workbench</div><h2>Keep every open question moving.</h2>
+    <p class="lo-muted">Bring the exception, owner, evidence and review decision into one traceable place.</p>
+    <div class="lo-features">
+      <div class="lo-feature"><div class="lo-kicker">01 / Import</div><h3>Bring in your existing exports</h3><p class="lo-muted">Start with bank statements and ledger CSV exports. Keep your existing accounting platform as the source of truth.</p></div>
+      <div class="lo-feature"><div class="lo-kicker">02 / Resolve</div><h3>Make exceptions actionable</h3><p class="lo-muted">See unmatched, duplicate and difference cases. Assign follow-ups and track status through review.</p></div>
+      <div class="lo-feature"><div class="lo-kicker">03 / Evidence</div><h3>Keep supporting documents connected</h3><p class="lo-muted">Associate private evidence with the exception it supports and preserve an audit trail.</p></div>
+    </div>
+  </section>
+  <section class="lo-section">
+    <div class="lo-cta">
+      <div><div class="lo-kicker">Request early access</div><h2>See how LedgerOps fits your month-end process.</h2><p class="lo-muted">Tell us a little about your practice. Our team can arrange a product walkthrough and discuss a pilot. Please do not submit bank statements, tax identifiers or client financial records in this form.</p></div>
+      <div id="demo" class="lo-panel">
+        <form id="ledgerops-demo-form" class="lo-form">
+          <label>Name *<input name="name" required maxlength="120" autocomplete="name"></label>
+          <label>Business email *<input name="email" type="email" required maxlength="180" autocomplete="email"></label>
+          <label>Firm / company *<input name="company" required maxlength="160" autocomplete="organization"></label>
+          <label>Country<input name="country" maxlength="80" autocomplete="country-name"></label>
+          <label>Phone<input name="phone" maxlength="40" autocomplete="tel"></label>
+          <label>Team size<input name="team_size" type="number" min="0" max="100000"></label>
+          <label>Clients managed<input name="client_count" type="number" min="0" max="100000"></label>
+          <label class="full">What is the biggest reconciliation follow-up challenge?<textarea name="message" rows="3" maxlength="1500"></textarea></label>
+          <label class="full consent"><input name="consent" type="checkbox" required value="1"><span>I agree that LedgerOps may contact me about this request. See the <a href="/privacy-policy" target="_blank" rel="noopener">privacy notice</a>.</span></label>
+          <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+          <div class="full"><button class="lo-btn" type="submit">Request a demo</button><p id="lo-form-message" class="lo-muted" role="status" aria-live="polite"></p></div>
+        </form>
+      </div>
+    </div>
+  </section>
+  <div class="lo-footer">© <span id="lo-year"></span> LedgerOps. Reconciliation workflow and evidence management for accounting teams.</div>
+</div>
+<script>
+(function(){
+ const form=document.getElementById("ledgerops-demo-form");
+ document.getElementById("lo-year").textContent=new Date().getFullYear();
+ form.addEventListener("submit",async function(e){
+  e.preventDefault(); const button=form.querySelector("button"); const msg=document.getElementById("lo-form-message");
+  button.disabled=true; button.textContent="Submitting…"; msg.textContent="";
+  const data=Object.fromEntries(new FormData(form).entries());
+  try{
+   const response=await fetch("/api/method/ledgerops.ledgerops.api.public_leads.submit_demo_request",{method:"POST",headers:{"Content-Type":"application/json","X-Frappe-CSRF-Token":window.csrf_token||""},body:JSON.stringify(data),credentials:"same-origin"});
+   const result=await response.json();
+   if(!response.ok||result.exc){throw new Error(result._server_messages?JSON.parse(result._server_messages).map(x=>JSON.parse(x).message).join(" "):(result.message||"Unable to submit request"));}
+   msg.textContent=(result.message&&result.message.message)||"Thank you. Your request has been received."; form.reset();
+  }catch(err){msg.textContent=err.message||"Unable to submit. Please try again.";}
+  finally{button.disabled=false;button.textContent="Request a demo";}
+ });
+})();
+</script>
+{% endblock %}

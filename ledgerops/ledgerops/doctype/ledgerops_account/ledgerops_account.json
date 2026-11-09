@@ -1,0 +1,107 @@
+{
+  "doctype": "DocType",
+  "name": "LedgerOps Account",
+  "module": "LedgerOps",
+  "autoname": "format:ACC-{####}",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "account_name",
+      "label": "Customer / Firm Name",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "account_type",
+      "label": "Account Type",
+      "fieldtype": "Select",
+      "options": "Trial\nPaying Customer\nPartner\nFormer Customer",
+      "default": "Trial",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "primary_email",
+      "label": "Primary Email",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "phone",
+      "label": "Phone",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "country",
+      "label": "Country",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "website",
+      "label": "Website",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "lifecycle_status",
+      "label": "Lifecycle Status",
+      "fieldtype": "Select",
+      "options": "Onboarding\nActive\nAt Risk\nSuspended\nChurned",
+      "default": "Onboarding",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "plan",
+      "label": "Plan",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "currency",
+      "label": "Billing Currency",
+      "fieldtype": "Data",
+      "default": "INR"
+    },
+    {
+      "fieldname": "monthly_recurring_revenue",
+      "label": "Monthly Recurring Revenue",
+      "fieldtype": "Currency"
+    },
+    {
+      "fieldname": "start_date",
+      "label": "Start Date",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "renewal_date",
+      "label": "Renewal Date",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "assigned_success_owner",
+      "label": "Customer Success Owner",
+      "fieldtype": "Link",
+      "options": "User"
+    },
+    {
+      "fieldname": "source_lead",
+      "label": "Source Lead",
+      "fieldtype": "Link",
+      "options": "LedgerOps Lead"
+    },
+    {
+      "fieldname": "notes",
+      "label": "Internal Notes",
+      "fieldtype": "Text"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0,
+      "report": 1,
+      "export": 0,
+      "share": 0
+    }
+  ]
+}

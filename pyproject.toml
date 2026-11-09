@@ -9,7 +9,10 @@ description = "Reconciliation exception and evidence workflow for accounting pra
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-dependencies = []
+dependencies = ["requests>=2.31,<3"]
 
 [tool.setuptools.packages.find]
 include = ["ledgerops*"]
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0-dev,<17.0.0"

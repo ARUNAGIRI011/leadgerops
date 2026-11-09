@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - main
-      - bootstrap/ledgerops-mvp
-      - feature/desk-rbac-cloudflare-ai
+      - "**"
   pull_request:
     branches:
       - main
+
+permissions:
+  contents: read
 
 jobs:
   python-tests:

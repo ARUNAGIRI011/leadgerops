@@ -1,0 +1,83 @@
+{
+  "doctype": "DocType",
+  "name": "LedgerOps Subscription",
+  "module": "LedgerOps",
+  "autoname": "format:SUB-{####}",
+  "track_changes": 1,
+  "fields": [
+    {
+      "fieldname": "account",
+      "label": "Customer Account",
+      "fieldtype": "Link",
+      "options": "LedgerOps Account",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "plan_name",
+      "label": "Plan",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Trialing\nActive\nPast Due\nCancelled\nExpired",
+      "default": "Trialing",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "billing_interval",
+      "label": "Billing Interval",
+      "fieldtype": "Select",
+      "options": "Monthly\nQuarterly\nAnnual",
+      "default": "Monthly"
+    },
+    {
+      "fieldname": "amount",
+      "label": "Amount",
+      "fieldtype": "Currency"
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Data",
+      "default": "INR"
+    },
+    {
+      "fieldname": "start_date",
+      "label": "Start Date",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "current_period_end",
+      "label": "Current Period End",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "external_subscription_id",
+      "label": "Payment Provider Subscription ID",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "auto_renew",
+      "label": "Auto Renew",
+      "fieldtype": "Check"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 0,
+      "report": 1,
+      "export": 0,
+      "share": 0
+    }
+  ]
+}
